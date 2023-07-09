@@ -6,12 +6,12 @@ It also has a dependancy on the mysql db (mariadb?)
 
 **Pre-req:**
 
-Need Azure DevOps org setup with build agent.
-Build agent should have the capability to unzip/Docker build
-Azure Subscription with a service principal setup that has contributor access.
-Setup Service connection with the Azure Subscription form ADO.
-Setup Service connection with the Docker hub from ADO.
-Setup Extension for Terraform in ADO.
+- Need Azure DevOps org setup with build agent.
+- Build agent should have the capability to unzip/Docker build
+- Azure Subscription with a service principal setup that has contributor access.
+- Setup Service connection with the Azure Subscription form ADO.
+- Setup Service connection with the Docker hub from ADO.
+- Setup Extension for Terraform in ADO.
 
 **Let's take a look at the files in this repo -**
 
