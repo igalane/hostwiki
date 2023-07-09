@@ -1,0 +1,84 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  name: 'Default'
+
+variables:
+ - group: TF_VARS
+
+stages:
+  - stage: terraform_validate
+    displayName: Terraform Init and Plan
+    jobs:
+    - job:
+      steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+      - task: TerraformTaskV4@4
+        displayName: TerraformInit
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'Azure Service connection'
+          backendAzureRmResourceGroupName: 'tfstate'
+          backendAzureRmStorageAccountName: 'tfstate28091'
+          backendAzureRmContainerName: 'tfstate'
+          backendAzureRmKey: 'prod.mediawiki.tfstate'
+          commandOptions: '-var appId=$(appId) -var password=$(password)'
+      - task: TerraformTaskV4@4
+        displayName: TerraformValidate
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+      - task: TerraformTaskV4@4
+        displayName: TerraformPlan
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          environmentServiceNameAzureRM: 'Azure Service connection'
+          commandOptions: '-var appId=$(appId) -var password=$(password)'
+
+  - stage: terraform_deploy
+    displayName: Terraform Plan and Deploy
+    jobs:
+    - job:
+      steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+      - task: TerraformTaskV4@4
+        displayName: TerraformInit
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'Azure Service connection'
+          backendAzureRmResourceGroupName: 'tfstate'
+          backendAzureRmStorageAccountName: 'tfstate28091'
+          backendAzureRmContainerName: 'tfstate'
+          backendAzureRmKey: 'prod.mediawiki.tfstate'
+          commandOptions: '-var appId=$(appId) -var password=$(password)'
+      - task: TerraformTaskV4@4
+        displayName: TerraformValidate
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+      - task: TerraformTaskV4@4
+        displayName: TerraformPlan
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          environmentServiceNameAzureRM: 'Azure Service connection'
+          commandOptions: '-var appId=$(appId) -var password=$(password)'
+      - task: TerraformTaskV4@4
+        displayName: TerraformApply
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          environmentServiceNameAzureRM: 'Azure Service connection'
+          commandOptions: '-var appId=$(appId) -var password=$(password)'
