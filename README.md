@@ -51,6 +51,7 @@ k8s/mediawiki.yaml:
 2. Add manual approval for TF Apply stage.
 3. Reduce hardcoding.
 4. Use k8s secrets to hold env variables used.
+5. Check how to use LocalSettings-aks.php
 
 
 
