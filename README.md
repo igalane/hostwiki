@@ -30,4 +30,29 @@ Azurepipelines/deploy.yaml:
   Deploys the newly built image to Azure AKS instance.
   Assumes that the AKS is up and running and also assumes the service connection to AKS.
 
+infra/main: 
+  Contains the TF code to create services/deployment/statefulset for mariadb and mediawiki installation.
+  We expose the mediawiki deployment using LoadBalancer service.
+
+infra/variables.tf: 
+  Variables for the appId and it's password. This will later be used to provide access to AKS on the ACR that is created.
+
+infra/Azurepipelines/buildInfra.yaml: 
+  Build pipeline yaml for ADO. This will expect a service connection to Azure subscription. 
+  This has two stages, one for the plan and other for deployment of resources.
+  The pipeline requires Terraform extension to be installed in the ADO organisation.
+
+k8s/mediawiki.yaml: 
+  Contains all the k8s resources that we can use to deploy the app on AKS.
+  This file is used by 'Azurepipelines/deploy.yaml' to deploy the app.
+
+# TODO:
+1. Use Helm charts for the deployment
+2. Add manual approval for TF Apply stage.
+3. Reduce hardcoding.
+4. Use k8s secrets to hold env variables used.
+
+
+
+
 
