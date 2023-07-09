@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb-sts
+spec:
+  serviceName: "mariadb-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb
+        ports:
+        - containerPort: 3306
+          name: mariadb-port
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          value: secretpassword
+        - name: MARIADB_DATABASE
+          value: wikidb
+        - name: MARIADB_USER
+          value: wikiuser
+        - name: MARIADB_PASSWORD
+          value: wikipassword
+        volumeMounts:
+        - name: mariadatadir
+          mountPath: /var/lib/mysql/
+  volumeClaimTemplates:
+  - metadata:
+      name: mariadatadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 300M
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-svc
+  labels:
+    app: mariadb
+spec:
+  ports:
+  - port: 3306
+    name: mariadb-port
+  clusterIP: None
+  selector:
+    app: mariadb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mediawiki
+  name: mediawiki
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mediawiki
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mediawiki
+    spec:
+      containers:
+      - image: ishwargalane/mediawiki:16
+        name: mediawiki
+        env:
+        - name: MEDIAWIKI_DB_HOST
+          value: mariadb-svc:3306
+        - name: MEDIAWIKI_DB_USER
+          value: wikiuser
+        - name: MEDIAWIKI_DB_PASSWORD
+          value: wikipassword
+        - name: MEDIAWIKI_DB_NAME
+          value: wikidb
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mediawiki
+  name: mediawiki
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: mediawiki
+  type: LoadBalancer
