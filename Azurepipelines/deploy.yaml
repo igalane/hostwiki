@@ -1,0 +1,31 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger: none
+
+resources:
+- repo: self
+pool:
+  name: 'Default'
+  vmImage: 'buildagent'
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Deploy
+  displayName: Deploy to AKS
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    steps:
+    - task: KubernetesManifest@1
+      inputs:
+        action: 'deploy'
+        connectionType: 'azureResourceManager'
+        azureSubscriptionConnection: 'Azure Service connection'
+        azureResourceGroup: 'mediawiki-rg'
+        kubernetesCluster: 'welcomed-foal-aks'
+        useClusterAdmin: true
+        manifests: 'mediawiki.yaml'
