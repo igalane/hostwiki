@@ -1,5 +1,5 @@
 # hostwiki
-This repo is to host the code to host a wiki on k8s
+This repo is to host the code to build and deploy mediawiki on k8s
 
 MediaWIKI is a PHP app that needs to be hosted on a webserver (Apache?)
 It also has a dependancy on the mysql db (mariadb?)
